@@ -135,13 +135,13 @@
         return document.getElementById(id);
     }
 
-    //动画函数
+    //变速动画函数
     function animate(element, target) {
         clearInterval(element.timeId);
         var current = element.offsetLeft;
         element.timeId = setInterval(function () {
-            var step = 15;
-            step = target - current > 0 ? step : -step;
+            var step = (target-current)/10;
+            step = step>0?Math.ceil(step):Math.floor(step);
             current += step;
             if (Math.abs(target - current) > Math.abs(step)) {
                 element.style.left = current + "px";
