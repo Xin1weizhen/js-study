@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #box {
+            height: 300px;
+        }
+
+        .screen {
+            width: 500px;
+            height: 300px;
+            margin: 100px auto;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen ul {
+            width: 3000px;
+            height: 300px;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .screen ul li {
+            list-style: none;
+            width: 500px;
+            height: 300px;
+            font-size: 50px;
+            font-weight: 700;
+            text-align: center;
+            color: #fff;
+            line-height: 300px;
+            background-color: gray;
+            border: 5px solid darkblue;
+            box-sizing: border-box;
+            float: left;
+        }
+
+        .screen ol {
+            width: 87px;
+            height: 15px;
+            position: absolute;
+            font-size: 12px;
+            line-height: 15px;
+            right: 15px;
+            bottom: 15px;
+        }
+
+        .screen ol li {
+            list-style: none;
+            width: 15px;
+            height: 15px;
+            text-align: center;
+            background-color: #fff;
+            margin-right: 3px;
+            padding: 0;
+            border: 1px solid #000;
+            box-sizing: border-box;
+            cursor: default;
+            float: left;
+        }
+
+        .screen ol li:last-child {
+            margin-right: 0;
+        }
+
+        .screen ol li.current {
+            background-color: #f12051;
+            color: #fff;
+        }
+
+        #bar {
+            width: 500px;
+            height: 45px;
+            background-color: rgba(0, 0, 0, 0);
+            margin-left: -250px;
+            /*display: none;*/
+            position: absolute;
+            left: 50%;
+            top: 120px;
+        }
+
+        #box #bar span {
+            width: 50px;
+            height: 45px;
+            line-height: 45px;
+            font-size: 25px;
+            cursor: default;
+            font-weight: 400;
+            color: #fff;
+            text-align: center;
+            background-color: #010;
+            display: block;
+            position: absolute;
+            top: 0;
+        }
+
+        #left {
+            left: 0;
+        }
+
+        #right {
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="box">
+    <div class="screen">
+        <ul>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+        </ul>
+        <ol></ol>
+        <div id="bar">
+            <span id="left">&lt;</span>
+            <span id="right">&gt;</span>
+        </div>
+    </div>
+
+</div>
+<script>
+    function my$(id) {
+        return document.getElementById(id);
+    }
+
+    function animate(element, target) {
+        clearInterval(element.timeId);
+        var current = element.offsetLeft;
+        element.timeId = setInterval(function () {
+            var step = 15;
+            step = target - current > 0 ? step : -step;
+            current += step;
+            if (Math.abs(target - current) > Math.abs(step)) {
+                element.style.left = current + "px";
+            } else {
+                clearInterval(element.timeId);
+                element.style.left = target + "px";
+            }
+        }, 10);
+    }
+
+    var box = my$("box");
+    var screen = box.children[0];
+    var ulObj = screen.children[0];
+    var list = ulObj.children;
+    var olObj = screen.children[1];
+    var pic = 0;
+    for (var i = 0; i < list.length; i++) {
+        var li = document.createElement("li");
+        olObj.appendChild(li);
+        li.innerHTML = i + 1;
+        li.setAttribute("index", i);
+        li.onmouseover = function () {
+            for (var j = 0; j < olObj.children.length; j++) {
+                olObj.children[j].removeAttribute("class");
+            }
+            this.className = "current";
+            pic = this.getAttribute("index");
+            animate(ulObj, -pic * screen.offsetWidth);
+        };
+    }
+    olObj.children[0].className = "current";
+    ulObj.appendChild(list[0].cloneNode(true));
+
+    var barObj = my$("bar");
+    var timeId = setInterval(clickRight, 2000);
+    screen.onmouseover = function () {
+        barObj.style.display = "block";
+        clearInterval(timeId);
+    };
+
+    screen.onmouseout = function () {
+        timeId = setInterval(clickRight, 2000);
+        //barObj.style.display="none";
+    }
+
+    var leftBar = my$("left");
+    var rightBar = my$("right");
+    leftBar.onclick = function () {
+        if (pic == 0) {
+            pic = ulObj.children.length - 1;
+            ulObj.style.left = -pic * screen.offsetWidth + "px";
+        }
+        pic--;
+        animate(ulObj, -pic * screen.offsetWidth);
+        for (var i = 0; i < olObj.children.length; i++) {
+            olObj.children[i].removeAttribute("class");
+        }
+        olObj.children[pic].className = "current";
+    };
+    rightBar.onclick = clickRight;
+
+    function clickRight() {
+        if (pic == ulObj.children.length - 1) {
+            pic = 0;
+            ulObj.style.left = 0 + "px";
+        }
+        pic++;
+        animate(ulObj, -pic * screen.offsetWidth);
+        for (var i = 0; i < olObj.children.length; i++) {
+            olObj.children[i].removeAttribute("class");
+        }
+        if (pic == ulObj.children.length - 1) {
+            olObj.children[0].className = "current";
+        } else {
+            olObj.children[pic].className = "current";
+        }
+    };
+</script>
+</body>
+</html>
